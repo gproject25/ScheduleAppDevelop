@@ -14,5 +14,13 @@ public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private String email;
 
+    public User(String email){
+        this.email = email;
+    }
+
+    public void update(String email) {
+        this.email = email;
+    }
 }
