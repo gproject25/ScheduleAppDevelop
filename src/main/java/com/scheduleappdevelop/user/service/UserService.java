@@ -27,14 +27,14 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<GetUsersResponse> getAll() {
-        List<User> users = userRepository.findAll();
+        List<User> users = userRepository.findAllByDeletedFalse();
 
         return users.stream().map(user -> new GetUsersResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt())).toList();
     }
 
     @Transactional(readOnly = true)
     public GetUserResponse getOne(Long userId) {
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new IllegalStateException("유저가 없습니다"));
         List<Schedule> schedules = scheduleRepository.findSchedulesByUserId(userId);
         List<GetScheduleResponse> dtos= schedules.stream().map(schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
@@ -44,7 +44,7 @@ public class UserService {
 
     @Transactional
     public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new IllegalStateException("유저가 없습니다"));
 
         user.update(request.getName(), request.getEmail());
@@ -53,10 +53,12 @@ public class UserService {
 
     @Transactional
     public void delete(Long userId) {
-        boolean existence = userRepository.existsById(userId);
-        if(!existence){
-            throw new IllegalStateException("유저가 없습니다");
-        }
-        userRepository.deleteById(userId);
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
+                () -> new IllegalStateException("유저가 없습니다"));
+
+        //dirt checking soft delete
+        user.softDelete();
+
+        //userRepository.deleteById(userId);
     }
 }

@@ -19,7 +19,7 @@ public class ScheduleService {
 
     @Transactional
     public CreateScheduleResponse createSchedule(Long userId, CreateScheduleRequest request) {
-        User user = userRepository.findById(userId).orElseThrow(
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new IllegalStateException("없는 유저입니다"));
 
         Schedule schedule = new Schedule(request.getTitle(), request.getContent(), user);
@@ -30,15 +30,15 @@ public class ScheduleService {
     @Transactional(readOnly = true)
     public GetScheduleResponse getOne(Long scheduleId) {
         //일정 탐색
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                ()-> new IllegalStateException("없는 일저입니다"));
+        Schedule schedule = scheduleRepository.findByIdAndActiveUser(scheduleId).orElseThrow(
+                ()-> new IllegalStateException("없는 일정입니다"));
 
         return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt());
     }
 
     @Transactional(readOnly = true)
     public List<GetScheduleResponse> getAll() {
-        List<Schedule> schedules = scheduleRepository.findAll();
+        List<Schedule> schedules = scheduleRepository.findAllByActiveUser();
 
         return schedules.stream().map( schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
     }
@@ -46,8 +46,8 @@ public class ScheduleService {
     @Transactional
     public UpdateScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest request) {
         //일정 탐색
-        Schedule schedule = scheduleRepository.findById(scheduleId).orElseThrow(
-                ()-> new IllegalStateException("없는 일저입니다"));
+        Schedule schedule = scheduleRepository.findByIdAndActiveUser(scheduleId).orElseThrow(
+                ()-> new IllegalStateException("없는 일정입니다"));
 
         //유저 가져오기
         User user = schedule.getUser();
@@ -60,7 +60,7 @@ public class ScheduleService {
     public void delete(Long scheduleId) {
         boolean existence = scheduleRepository.existsById(scheduleId);
         if(!existence){
-            throw new IllegalStateException("없는 유적입니다");
+            throw new IllegalStateException("없는 유저입니다");
         }
 
         scheduleRepository.deleteById(scheduleId);

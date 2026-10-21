@@ -17,6 +17,12 @@ public class User extends BaseEntity {
     private String name;
     private String email;
 
+    //soft delete
+    private boolean deleted = false;
+    public void softDelete() {
+        this.deleted = true;
+    }
+
     public User(String name, String email){
         this.name = name;
         this.email = email;
