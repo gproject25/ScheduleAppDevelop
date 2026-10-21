@@ -1,0 +1,20 @@
+package com.scheduleappdevelop.user.dto;
+
+import com.scheduleappdevelop.schedule.dto.GetScheduleResponse;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@Getter
+@RequiredArgsConstructor
+public class GetUserResponse {
+    private final Long id;
+    private final String name;
+    private final String email;
+    private final LocalDateTime createAt;
+    private final LocalDateTime modifiedAt;
+
+    private final List<GetScheduleResponse> scheduleList;
+}
