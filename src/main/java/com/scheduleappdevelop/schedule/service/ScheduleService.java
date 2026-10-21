@@ -44,10 +44,10 @@ public class ScheduleService {
     }
 
     @Transactional
-    public UpdateScheduleResponse updateSchedule(Long scheduleId, UpdateScheduleRequest request) {
-        //일정 탐색
-        Schedule schedule = scheduleRepository.findByIdAndActiveUser(scheduleId).orElseThrow(
-                ()-> new IllegalStateException("없는 일정입니다"));
+    public UpdateScheduleResponse updateSchedule(Long scheduleId, Long userId, UpdateScheduleRequest request) {
+        //로기인된 유저 -> 본인 일정 탐색
+        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
+                ()-> new IllegalStateException("이 일정은 수정할 수 없습니다"));
 
         //유저 가져오기
         User user = schedule.getUser();
@@ -57,12 +57,12 @@ public class ScheduleService {
     }
 
     @Transactional
-    public void delete(Long scheduleId) {
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if(!existence){
-            throw new IllegalStateException("없는 유저입니다");
-        }
+    public void delete(Long scheduleId, Long userId) {
+        //로기인된 유저 -> 본인 일정 탐색
+        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
+                ()-> new IllegalStateException("이 일정은 삭제할 수 없습니다"));
 
-        scheduleRepository.deleteById(scheduleId);
+        //삭제
+        scheduleRepository.delete(schedule);
     }
 }

@@ -47,12 +47,12 @@ public class ScheduleController {
     }
 
     //일정 수정
-    @PutMapping("/schedules")
-    public ResponseEntity<UpdateScheduleResponse> updateSchedule(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @Valid @RequestBody UpdateScheduleRequest request){
+    @PutMapping("/schedules/{scheduleId}")
+    public ResponseEntity<UpdateScheduleResponse> updateSchedule(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @PathVariable Long scheduleId, @Valid @RequestBody UpdateScheduleRequest request){
         if(sessionUser == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(sessionUser.getId(), request));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(scheduleId, sessionUser.getId(), request));
     }
 
     //특정 일정 삭제
@@ -61,7 +61,7 @@ public class ScheduleController {
         if(sessionUser == null){
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
-        scheduleService.delete(scheduleId);
+        scheduleService.delete(scheduleId,sessionUser.getId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

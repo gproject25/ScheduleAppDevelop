@@ -16,4 +16,7 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
 
     @Query("SELECT S FROM Schedule S JOIN S.user u WHERE u.deleted = false AND S.id = :id")
     Optional<Schedule> findByIdAndActiveUser(@Param("id") Long id);
+
+    @Query("SELECT S FROM Schedule S JOIN S.user u WHERE u.deleted = false AND S.id = :scheduleId AND u.id = :userId")
+    Optional<Schedule> findByIdAndUserId(@Param("scheduleId") Long scheduleId, @Param("userId") Long userId);
 }
