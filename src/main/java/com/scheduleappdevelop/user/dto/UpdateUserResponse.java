@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UpdateUserResponse {
     private final Long id;
+    private final String name;
     private final String email;
     private final LocalDateTime createAt;
     private final LocalDateTime modifiedAt;
