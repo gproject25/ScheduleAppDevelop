@@ -26,6 +26,18 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
+    public LoginResponse login(LoginRequest request){
+        User user = userRepository.findByEmailAndDeletedFalse(request.getEmail()).orElseThrow(
+                () -> new IllegalStateException("이메일이 올바르지 않습니다"));
+
+        if (!request.getPassword().equals(user.getPassword())) {
+            throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
+        }
+
+        return new LoginResponse(user.getId(),user.getName(), user.getEmail());
+    }
+
+    @Transactional(readOnly = true)
     public List<GetUsersResponse> getAll() {
         List<User> users = userRepository.findAllByDeletedFalse();
 
@@ -56,7 +68,7 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new IllegalStateException("유저가 없습니다"));
 
-        //dirt checking soft delete
+        //dirty checking soft delete
         user.softDelete();
 
         //userRepository.deleteById(userId);

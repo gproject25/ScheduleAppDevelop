@@ -37,8 +37,8 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> getAll() {
-        List<Schedule> schedules = scheduleRepository.findAllByActiveUser();
+    public List<GetScheduleResponse> getAll(Long userId) {
+        List<Schedule> schedules = scheduleRepository.findAllByActiveUser(userId);
 
         return schedules.stream().map( schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
     }
