@@ -1,5 +1,6 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.exception.EntityNotFoundException;
 import com.scheduleappdevelop.schedule.dto.GetScheduleResponse;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
@@ -20,6 +21,12 @@ public class UserService {
 
     @Transactional
     public CreateUserResponse createUser(CreateUserRequest request) {
+        //이메일 중복 검증
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
+
+        //유저 저장
         User user = new User(request.getName(),request.getEmail(), request.getPassword());
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(savedUser.getId(),savedUser.getName(), savedUser.getEmail(), savedUser.getCreatedAt(),savedUser.getModifiedAt());
@@ -27,18 +34,22 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public LoginResponse login(LoginRequest request){
+        //이메일 존재 확인
         User user = userRepository.findByEmailAndDeletedFalse(request.getEmail()).orElseThrow(
-                () -> new IllegalStateException("이메일이 올바르지 않습니다"));
+                () -> new IllegalStateException("이메일이 존재하지 않습니다"));
 
+        //비밀번호 검증
         if (!request.getPassword().equals(user.getPassword())) {
             throw new IllegalArgumentException("비밀번호가 올바르지 않습니다.");
         }
 
+        //로그인 성공
         return new LoginResponse(user.getId(),user.getName(), user.getEmail());
     }
 
     @Transactional(readOnly = true)
     public List<GetUsersResponse> getAll() {
+        //soft Delete 안되어 있는 유저들 전체 조회
         List<User> users = userRepository.findAllByDeletedFalse();
 
         return users.stream().map(user -> new GetUsersResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt())).toList();
@@ -46,8 +57,11 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public GetUserResponse getOne(Long userId) {
+        //soft Delete 안되어있는 유저 조회
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
-                () -> new IllegalStateException("유저가 없습니다"));
+                () -> new EntityNotFoundException("유저가 없습니다"));
+
+        //Dtos list 활용
         List<Schedule> schedules = scheduleRepository.findSchedulesByUserId(userId);
         List<GetScheduleResponse> dtos= schedules.stream().map(schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
 
@@ -56,21 +70,27 @@ public class UserService {
 
     @Transactional
     public UpdateUserResponse updateUser(Long userId, UpdateUserRequest request) {
-        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
-                () -> new IllegalStateException("유저가 없습니다"));
+        //중복 이메일 검증
+        if(userRepository.existsByEmail(request.getEmail())){
+            throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+        }
 
+        //soft Delete 안되어있는 유저 조회
+        User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
+                () -> new EntityNotFoundException("유저가 없습니다"));
+
+        //dirty check update
         user.update(request.getName(), request.getEmail());
         return new UpdateUserResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt());
     }
 
     @Transactional
     public void delete(Long userId) {
+        //Id 탐색 + soft delete이 안된 경우를 검증
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
-                () -> new IllegalStateException("유저가 없습니다"));
+                () -> new EntityNotFoundException("유저가 없습니다"));
 
-        //dirty checking soft delete
+        //dirty check방식으로 soft delete
         user.softDelete();
-
-        //userRepository.deleteById(userId);
     }
 }
