@@ -20,7 +20,7 @@ public class UserService {
 
     @Transactional
     public CreateUserResponse createUser(CreateUserRequest request) {
-        User user = new User(request.getName(),request.getEmail());
+        User user = new User(request.getName(),request.getEmail(), request.getPassword());
         User savedUser = userRepository.save(user);
         return new CreateUserResponse(savedUser.getId(),savedUser.getName(), savedUser.getEmail(), savedUser.getCreatedAt(),savedUser.getModifiedAt());
     }
