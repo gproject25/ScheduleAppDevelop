@@ -11,6 +11,10 @@ import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import com.scheduleappdevelop.user.entity.User;
 import com.scheduleappdevelop.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -95,5 +99,13 @@ public class ScheduleService {
 
         //soft delete
         schedule.softDelete();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<SchedulePageResponse> getSchedulesByPage(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
+
+        Page<SchedulePageResponse> dto = scheduleRepository.getSchedulesByPage(pageable);
+        return dto;
     }
 }

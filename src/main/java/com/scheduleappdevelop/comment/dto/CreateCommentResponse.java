@@ -12,6 +12,6 @@ public class CreateCommentResponse {
     private final Long scheduleId;
     private final String content;
     private final String author;
-    private final LocalDateTime createAt;
+    private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 }

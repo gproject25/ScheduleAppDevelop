@@ -15,7 +15,7 @@ public class GetUserResponse {
     private final Long id;
     private final String name;
     private final String email;
-    private final LocalDateTime createAt;
+    private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
     private final List<GetSchedulesResponse> scheduleList;

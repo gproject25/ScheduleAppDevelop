@@ -12,6 +12,6 @@ public class UpdateScheduleResponse {
     private final String title;
     private final String content;
     private final String user;
-    private final LocalDateTime createAt;
+    private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 }

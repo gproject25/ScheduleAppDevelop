@@ -1,6 +1,9 @@
 package com.scheduleappdevelop.schedule.repository;
 
+import com.scheduleappdevelop.schedule.dto.SchedulePageResponse;
 import com.scheduleappdevelop.schedule.entity.Schedule;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,4 +17,22 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
     List<Schedule> findAllByActiveSchedule(@Param("userId") Long userId);
 
     Optional<Schedule> findByIdAndDeletedFalse(Long scheduleId);
+
+
+    //Paging
+    @Query("""
+    SELECT new com.scheduleappdevelop.schedule.dto.SchedulePageResponse(
+        s.id,
+        u.name,
+        s.title,
+        s.content,
+        (SELECT COUNT(c) FROM Comment c WHERE c.schedule.id = s.id),
+        s.createdAt,
+        s.modifiedAt
+    )
+    FROM Schedule s
+    JOIN s.user u
+    """)
+    Page<SchedulePageResponse> getSchedulesByPage(Pageable pageable);
+
 }
