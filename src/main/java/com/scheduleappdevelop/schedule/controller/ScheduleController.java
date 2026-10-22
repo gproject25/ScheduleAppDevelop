@@ -1,5 +1,6 @@
 package com.scheduleappdevelop.schedule.controller;
 
+import com.scheduleappdevelop.exception.UnauthorizedException;
 import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.service.ScheduleService;
 import com.scheduleappdevelop.config.SessionUser;
@@ -20,7 +21,7 @@ public class ScheduleController {
     @PostMapping("/schedules")
     public ResponseEntity<CreateScheduleResponse> createSchedule(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @Valid @RequestBody CreateScheduleRequest request){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(sessionUser.getId(), request));
     }
@@ -41,7 +42,7 @@ public class ScheduleController {
     @GetMapping("users/currentUser/schedules")
     public ResponseEntity<List<GetScheduleResponse>> getCurrentSchedules(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(sessionUser.getId()));
     }
@@ -50,7 +51,7 @@ public class ScheduleController {
     @PutMapping("/schedules/{scheduleId}")
     public ResponseEntity<UpdateScheduleResponse> updateSchedule(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @PathVariable Long scheduleId, @Valid @RequestBody UpdateScheduleRequest request){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.updateSchedule(scheduleId, sessionUser.getId(), request));
     }
@@ -59,7 +60,7 @@ public class ScheduleController {
     @DeleteMapping("/schedules/{scheduleId}")
     public ResponseEntity<Void> deleteSchedule(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @PathVariable Long scheduleId){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         scheduleService.delete(scheduleId,sessionUser.getId());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();

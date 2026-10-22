@@ -1,6 +1,7 @@
 package com.scheduleappdevelop.user.controller;
 
 import com.scheduleappdevelop.config.SessionUser;
+import com.scheduleappdevelop.exception.UnauthorizedException;
 import com.scheduleappdevelop.user.dto.*;
 import com.scheduleappdevelop.user.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -59,7 +60,7 @@ public class UserController {
     @GetMapping("/users/currentUser")
     public ResponseEntity<GetUserResponse> getCurrentUser(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         return ResponseEntity.status(HttpStatus.OK).body(userService.getOne(sessionUser.getId()));
     }
@@ -68,7 +69,7 @@ public class UserController {
     @PutMapping("/users")
     public ResponseEntity<UpdateUserResponse> updateUser(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, @Valid @RequestBody UpdateUserRequest request){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         return ResponseEntity.status(HttpStatus.OK).body(userService.updateUser(sessionUser.getId(), request));
     }
@@ -77,7 +78,7 @@ public class UserController {
     @DeleteMapping("/users")
     public ResponseEntity<Void> deleteUser(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser, HttpSession session){
         if(sessionUser == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+            throw new UnauthorizedException("로그인이 필요합니다");
         }
         userService.delete(sessionUser.getId());
         session.invalidate();
