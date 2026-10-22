@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -44,7 +45,7 @@ public class ScheduleService {
         //댓글도 탐색
         List<Comment> comments = commentRepository.findAllByScheduleId(scheduleId);
         List<GetCommentResponse> dtos = comments.stream().map(
-                comment -> new GetCommentResponse(comment.getId(), comment.getContent(), comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt())).toList();
+                comment -> new GetCommentResponse(comment.getId(),comment.getSchedule().getId(), comment.getContent(), comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt())).toList();
 
         return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt(), dtos);
     }
@@ -64,7 +65,7 @@ public class ScheduleService {
                 () -> new EntityNotFoundException("일정이 없습니다"));
 
         //로기인된 유저 -> 본인 일정만 수정 가능
-        if(schedule.getUser().getId() != userId){
+        if(!Objects.equals(schedule.getUser().getId(), userId)){
             throw new UnauthorizedException("이 일정을 수정할 권한이 없습니다");
         }
 
@@ -82,7 +83,7 @@ public class ScheduleService {
                 () -> new EntityNotFoundException("일정이 없습니다"));
 
         //로기인된 유저 -> 본인 일정만 삭제 가능
-        if(schedule.getUser().getId() != userId){
+        if(!Objects.equals(schedule.getUser().getId(), userId)){
             throw new UnauthorizedException("이 일정을 삭제할 권한이 없습니다");
         }
 

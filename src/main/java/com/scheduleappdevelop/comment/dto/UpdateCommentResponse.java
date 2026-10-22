@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UpdateCommentResponse {
     private final Long id;
+    private final Long scheduleId;
     private final String content;
     private final String author;
     private final LocalDateTime createAt;

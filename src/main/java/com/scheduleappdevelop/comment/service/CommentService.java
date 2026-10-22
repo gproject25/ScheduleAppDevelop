@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -38,7 +39,7 @@ public class CommentService {
         Comment comment = new Comment(request.getContent(), schedule, user);
         Comment savedComment = commentRepository.save(comment);
 
-        return new CreateCommentResponse(savedComment.getId(), savedComment.getContent(), user.getName(), savedComment.getCreatedAt(), savedComment.getModifiedAt());
+        return new CreateCommentResponse(savedComment.getId(),savedComment.getSchedule().getId(), savedComment.getContent(), user.getName(), savedComment.getCreatedAt(), savedComment.getModifiedAt());
     }
 
     @Transactional(readOnly = true)
@@ -47,7 +48,7 @@ public class CommentService {
         Comment comment = commentRepository.findByIdAndDeletedFalse(commentId).orElseThrow(
                 () -> new EntityNotFoundException("댓글이 없습니다"));
 
-        return new GetCommentResponse(comment.getId(),comment.getContent(),comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt());
+        return new GetCommentResponse(comment.getId(),comment.getSchedule().getId(), comment.getContent(),comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt());
     }
 
     @Transactional(readOnly = true)
@@ -55,7 +56,7 @@ public class CommentService {
         //userId가 null이면 전체 조회,  null이 아니면 userId에 해당하는 댓글만 조회
         List<Comment> comments = commentRepository.findAllByUserId(userId);
 
-        return comments.stream().map( comment -> new GetCommentResponse(comment.getId(),comment.getContent(),comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt())).toList();
+        return comments.stream().map( comment -> new GetCommentResponse(comment.getId(), comment.getSchedule().getId(), comment.getContent(),comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt())).toList();
     }
 
     @Transactional
@@ -65,13 +66,13 @@ public class CommentService {
                 () -> new EntityNotFoundException("댓글이 없습니다"));
 
         //본인이 작성한 댓글만 수정할 수 있음
-        if(comment.getUser().getId() != userId){
+        if(!Objects.equals(comment.getUser().getId(), userId)){
             throw new UnauthorizedException("이 댓글을 수정할 권한이 없습니다");
         }
 
         comment.update(request.getContent());
 
-        return new UpdateCommentResponse(comment.getId(), comment.getContent(), comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt());
+        return new UpdateCommentResponse(comment.getId(),comment.getSchedule().getId(), comment.getContent(), comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt());
     }
 
 
@@ -82,7 +83,7 @@ public class CommentService {
                 () -> new EntityNotFoundException("댓글이 없습니다"));
 
         //본인이 작성한 댓글만 삭제할 수 있음
-        if(comment.getUser().getId() != userId){
+        if(!Objects.equals(comment.getUser().getId(), userId)){
             throw new UnauthorizedException("이 댓글을 삭제할 권한이 없습니다");
         }
 

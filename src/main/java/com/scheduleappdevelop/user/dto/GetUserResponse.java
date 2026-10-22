@@ -1,5 +1,6 @@
 package com.scheduleappdevelop.user.dto;
 
+import com.scheduleappdevelop.comment.dto.GetCommentResponse;
 import com.scheduleappdevelop.schedule.dto.GetScheduleResponse;
 import com.scheduleappdevelop.schedule.dto.GetSchedulesResponse;
 import lombok.Getter;
@@ -18,4 +19,5 @@ public class GetUserResponse {
     private final LocalDateTime modifiedAt;
 
     private final List<GetSchedulesResponse> scheduleList;
+    private final List<GetCommentResponse> commentList;
 }

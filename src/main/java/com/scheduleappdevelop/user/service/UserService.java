@@ -1,10 +1,10 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.comment.dto.GetCommentResponse;
 import com.scheduleappdevelop.comment.entity.Comment;
 import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.config.PasswordEncoder;
 import com.scheduleappdevelop.exception.EntityNotFoundException;
-import com.scheduleappdevelop.schedule.dto.GetScheduleResponse;
 import com.scheduleappdevelop.schedule.dto.GetSchedulesResponse;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
@@ -72,9 +72,13 @@ public class UserService {
 
         //일정도 탐색
         List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
-        List<GetSchedulesResponse> dtos= schedules.stream().map(schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
+        List<GetSchedulesResponse> dtos = schedules.stream().map(schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
 
-        return new GetUserResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt(), dtos);
+        //댓글도 탐색
+        List<Comment> comments = commentRepository.findAllByUserId(userId);
+        List<GetCommentResponse> dtos2 = comments.stream().map(comment -> new GetCommentResponse(comment.getId(), comment.getSchedule().getId(), comment.getContent(),comment.getUser().getName(), comment.getCreatedAt(),comment.getModifiedAt())).toList();
+
+        return new GetUserResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt(), dtos, dtos2);
     }
 
     @Transactional
