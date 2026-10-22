@@ -6,6 +6,7 @@ import com.scheduleappdevelop.schedule.service.ScheduleService;
 import com.scheduleappdevelop.config.SessionUser;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,12 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.CREATED).body(scheduleService.createSchedule(sessionUser.getId(), request));
     }
 
+    //Paging (첫 페이지부터 10개씩(default))
+    @GetMapping("/schedules/page")
+    public ResponseEntity<Page<SchedulePageResponse>> getPage(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size) {
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getSchedulesByPage(page,size));
+    }
+
     //단 건 조회 -> 로그인 필요 없음
     @GetMapping("/schedules/{scheduleId}")
     public ResponseEntity<GetScheduleResponse> getSchedule(@PathVariable Long scheduleId){
@@ -34,13 +41,13 @@ public class ScheduleController {
 
     //전체 일정 조회 -> 로그인 필요 없음
     @GetMapping("/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getSchedules(){
+    public ResponseEntity<List<GetSchedulesResponse>> getSchedules(){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(null));
     }
 
     //유저 일정 전체 조회 (login 상태)
     @GetMapping("users/currentUser/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getCurrentSchedules(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
+    public ResponseEntity<List<GetSchedulesResponse>> getCurrentSchedules(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
         if(sessionUser == null){
             throw new UnauthorizedException("로그인이 필요합니다");
         }

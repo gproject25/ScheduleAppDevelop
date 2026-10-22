@@ -11,7 +11,7 @@ public class UpdateScheduleResponse {
     private final Long id;
     private final String title;
     private final String content;
-    private final String userName;
-    private final LocalDateTime createAt;
+    private final String user;
+    private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 }
