@@ -26,6 +26,13 @@ public class Schedule extends BaseEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    //soft delete
+    @Column(nullable = false)
+    private boolean deleted = false;
+    public void softDelete() {
+        this.deleted = true;
+    }
+
     public Schedule(String title, String content, User user){
         this.title = title;
         this.content = content;

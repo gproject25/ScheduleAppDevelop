@@ -1,5 +1,8 @@
 package com.scheduleappdevelop.schedule.service;
 
+import com.scheduleappdevelop.comment.dto.GetCommentResponse;
+import com.scheduleappdevelop.comment.entity.Comment;
+import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.exception.EntityNotFoundException;
 import com.scheduleappdevelop.exception.UnauthorizedException;
 import com.scheduleappdevelop.schedule.dto.*;
@@ -11,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,6 +22,7 @@ import java.util.List;
 public class ScheduleService {
     private final ScheduleRepository scheduleRepository;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public CreateScheduleResponse createSchedule(Long userId, CreateScheduleRequest request) {
@@ -32,32 +37,36 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public GetScheduleResponse getOne(Long scheduleId) {
-        //일정 탐색 + soft delete 여부 확인
-        Schedule schedule = scheduleRepository.findByIdAndActiveUser(scheduleId).orElseThrow(
-                ()-> new EntityNotFoundException("없는 일정입니다"));
+        //일정 탐색
+        Schedule schedule = scheduleRepository.findByIdAndDeletedFalse(scheduleId).orElseThrow(
+                () -> new EntityNotFoundException("일정이 없습니다"));
 
-        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt());
+        //댓글도 탐색
+        List<Comment> comments = commentRepository.findAllByScheduleId(scheduleId);
+        List<GetCommentResponse> dtos = comments.stream().map(
+                comment -> new GetCommentResponse(comment.getId(), comment.getContent(), comment.getUser().getName(), comment.getCreatedAt(), comment.getModifiedAt())).toList();
+
+        return new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt(), dtos);
     }
 
     @Transactional(readOnly = true)
-    public List<GetScheduleResponse> getAll(Long userId) {
+    public List<GetSchedulesResponse> getAll(Long userId) {
         //userId가 null이면 전체 조회,  null이 아니면 userId에 해당하는 일정만 조회
-        List<Schedule> schedules = scheduleRepository.findAllByActiveUser(userId);
+        List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
 
-        return schedules.stream().map( schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
+        return schedules.stream().map( schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
     }
 
     @Transactional
     public UpdateScheduleResponse updateSchedule(Long scheduleId, Long userId, UpdateScheduleRequest request) {
-        //일정 존재 확인
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if(!existence){
-            throw new EntityNotFoundException("일정이 없습니다");
-        }
+        //일정 탐색
+        Schedule schedule = scheduleRepository.findByIdAndDeletedFalse(scheduleId).orElseThrow(
+                () -> new EntityNotFoundException("일정이 없습니다"));
 
         //로기인된 유저 -> 본인 일정만 수정 가능
-        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
-                ()-> new UnauthorizedException("이 일정을 수정할 권한이 없습니다"));
+        if(schedule.getUser().getId() != userId){
+            throw new UnauthorizedException("이 일정을 수정할 권한이 없습니다");
+        }
 
         //유저 가져오기
         User user = schedule.getUser();
@@ -68,17 +77,22 @@ public class ScheduleService {
 
     @Transactional
     public void delete(Long scheduleId, Long userId) {
-        //일정 존재 확인
-        boolean existence = scheduleRepository.existsById(scheduleId);
-        if(!existence){
-            throw new EntityNotFoundException("일정이 없습니다");
-        }
+        //일정 탐색
+        Schedule schedule = scheduleRepository.findByIdAndDeletedFalse(scheduleId).orElseThrow(
+                () -> new EntityNotFoundException("일정이 없습니다"));
 
         //로기인된 유저 -> 본인 일정만 삭제 가능
-        Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
-                ()-> new UnauthorizedException("이 일정을 삭제할 권한이 없습니다"));
+        if(schedule.getUser().getId() != userId){
+            throw new UnauthorizedException("이 일정을 삭제할 권한이 없습니다");
+        }
 
-        //삭제
-        scheduleRepository.delete(schedule);
+        //관련된 모든 댓글도 soft delete
+        List<Comment> comments = commentRepository.findAllByScheduleId(scheduleId);
+        for (Comment comment : comments) {
+            comment.softDelete();
+        }
+
+        //soft delete
+        schedule.softDelete();
     }
 }

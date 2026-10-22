@@ -9,14 +9,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
-    List<Schedule> findSchedulesByUserId(Long userId);
 
-    @Query("SELECT S FROM Schedule S JOIN S.user u WHERE u.deleted = false AND (:userId IS NULL OR u.id = :userId)")
-    List<Schedule> findAllByActiveUser(@Param("userId") Long userId);
+    @Query("SELECT S FROM Schedule S JOIN S.user u WHERE S.deleted = false AND (:userId IS NULL OR u.id = :userId)")
+    List<Schedule> findAllByActiveSchedule(@Param("userId") Long userId);
 
-    @Query("SELECT S FROM Schedule S JOIN S.user u WHERE u.deleted = false AND S.id = :id")
-    Optional<Schedule> findByIdAndActiveUser(@Param("id") Long id);
-
-    @Query("SELECT S FROM Schedule S JOIN S.user u WHERE u.deleted = false AND S.id = :scheduleId AND u.id = :userId")
-    Optional<Schedule> findByIdAndUserId(@Param("scheduleId") Long scheduleId, @Param("userId") Long userId);
+    Optional<Schedule> findByIdAndDeletedFalse(Long scheduleId);
 }

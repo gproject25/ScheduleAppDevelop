@@ -34,13 +34,13 @@ public class ScheduleController {
 
     //전체 일정 조회 -> 로그인 필요 없음
     @GetMapping("/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getSchedules(){
+    public ResponseEntity<List<GetSchedulesResponse>> getSchedules(){
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(null));
     }
 
     //유저 일정 전체 조회 (login 상태)
     @GetMapping("users/currentUser/schedules")
-    public ResponseEntity<List<GetScheduleResponse>> getCurrentSchedules(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
+    public ResponseEntity<List<GetSchedulesResponse>> getCurrentSchedules(@SessionAttribute(name = "loginUser", required = false) SessionUser sessionUser){
         if(sessionUser == null){
             throw new UnauthorizedException("로그인이 필요합니다");
         }

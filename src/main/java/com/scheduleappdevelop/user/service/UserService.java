@@ -1,8 +1,11 @@
 package com.scheduleappdevelop.user.service;
 
+import com.scheduleappdevelop.comment.entity.Comment;
+import com.scheduleappdevelop.comment.repository.CommentRepository;
 import com.scheduleappdevelop.config.PasswordEncoder;
 import com.scheduleappdevelop.exception.EntityNotFoundException;
 import com.scheduleappdevelop.schedule.dto.GetScheduleResponse;
+import com.scheduleappdevelop.schedule.dto.GetSchedulesResponse;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
 import com.scheduleappdevelop.user.dto.*;
@@ -20,6 +23,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final ScheduleRepository scheduleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CommentRepository commentRepository;
 
     @Transactional
     public CreateUserResponse createUser(CreateUserRequest request) {
@@ -66,9 +70,9 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new EntityNotFoundException("유저가 없습니다"));
 
-        //Dtos list 활용
-        List<Schedule> schedules = scheduleRepository.findSchedulesByUserId(userId);
-        List<GetScheduleResponse> dtos= schedules.stream().map(schedule -> new GetScheduleResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
+        //일정도 탐색
+        List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
+        List<GetSchedulesResponse> dtos= schedules.stream().map(schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(),user.getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
 
         return new GetUserResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt(), dtos);
     }
@@ -96,6 +100,18 @@ public class UserService {
                 () -> new EntityNotFoundException("유저가 없습니다"));
 
         //dirty check방식으로 soft delete
+
+        //관련된 일정 + 댓글 soft delete
+        List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
+        for (Schedule schedule : schedules) {
+
+            List<Comment> comments = commentRepository.findAllByScheduleId(schedule.getId());
+            for (Comment comment : comments) {
+                comment.softDelete();
+            }
+            schedule.softDelete();
+        }
+
         user.softDelete();
     }
 }
