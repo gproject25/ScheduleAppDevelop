@@ -1,6 +1,7 @@
 package com.scheduleappdevelop.schedule.service;
 
 import com.scheduleappdevelop.exception.EntityNotFoundException;
+import com.scheduleappdevelop.exception.UnauthorizedException;
 import com.scheduleappdevelop.schedule.dto.*;
 import com.scheduleappdevelop.schedule.entity.Schedule;
 import com.scheduleappdevelop.schedule.repository.ScheduleRepository;
@@ -54,9 +55,9 @@ public class ScheduleService {
             throw new EntityNotFoundException("일정이 없습니다");
         }
 
-        //로기인된 유저 -> 본인 일정 탐색
+        //로기인된 유저 -> 본인 일정만 수정 가능
         Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
-                ()-> new IllegalStateException("이 일정을 수정할 권한이 없습니다"));
+                ()-> new UnauthorizedException("이 일정을 수정할 권한이 없습니다"));
 
         //유저 가져오기
         User user = schedule.getUser();
@@ -73,9 +74,9 @@ public class ScheduleService {
             throw new EntityNotFoundException("일정이 없습니다");
         }
 
-        //로기인된 유저 -> 본인 일정 탐색
+        //로기인된 유저 -> 본인 일정만 삭제 가능
         Schedule schedule = scheduleRepository.findByIdAndUserId(scheduleId,userId).orElseThrow(
-                ()-> new IllegalStateException("이 일정을 삭제할 권한이 없습니다"));
+                ()-> new UnauthorizedException("이 일정을 삭제할 권한이 없습니다"));
 
         //삭제
         scheduleRepository.delete(schedule);
