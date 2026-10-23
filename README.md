@@ -20,7 +20,16 @@ Spring Boot와 Spring Data JPA를 활용한 일정 및 사용자 관리 Part 2 �
 
 
 ---------------
+
+### 📮 Postman Collection
+
+- **Download:** [일정관리Develop Postman Collection](./일정관리Develop.postman_collection.json)
+
+
+
 <br>
+
+
 
 ---
 
