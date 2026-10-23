@@ -33,7 +33,7 @@ Spring Boot와 Spring Data JPA를 활용한 일정 및 사용자 관리 Part 2 �
 
 ---
 
-https://bolder-shrimp-6f4.notion.site/Develop-API-402df7a8441c80ff9729d4e83ea973f1
+#### Documentation: [Notion - 일정 관리 Develop API 명세서 ](https://bolder-shrimp-6f4.notion.site/Develop-API-402df7a8441c80ff9729d4e83ea973f1)
 
 -----------
 
