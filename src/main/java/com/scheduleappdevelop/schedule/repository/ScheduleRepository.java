@@ -26,12 +26,13 @@ public interface ScheduleRepository extends JpaRepository<Schedule,Long> {
         u.name,
         s.title,
         s.content,
-        (SELECT COUNT(c) FROM Comment c WHERE c.schedule.id = s.id),
+        (SELECT COUNT(c) FROM Comment c WHERE c.schedule.id = s.id AND c.deleted=false),
         s.createdAt,
-        s.modifiedAt
+        s.modifiedAt 
     )
     FROM Schedule s
     JOIN s.user u
+    WHERE s.deleted=false
     """)
     Page<SchedulePageResponse> getSchedulesByPage(Pageable pageable);
 

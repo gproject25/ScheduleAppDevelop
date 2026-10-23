@@ -87,6 +87,6 @@ public class CommentService {
             throw new UnauthorizedException("이 댓글을 삭제할 권한이 없습니다");
         }
 
-        commentRepository.deleteById(commentId);
+        comment.softDelete();
     }
 }

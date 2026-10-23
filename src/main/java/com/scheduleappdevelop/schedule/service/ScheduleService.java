@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.event.TransactionalEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,9 +104,10 @@ public class ScheduleService {
 
     @Transactional(readOnly = true)
     public Page<SchedulePageResponse> getSchedulesByPage(int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("modifiedAt").descending());
 
-        Page<SchedulePageResponse> dto = scheduleRepository.getSchedulesByPage(pageable);
-        return dto;
+        //수정일 기준 내림차순으로 정렬 + soft Delete은 뒤로
+        Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Order.desc("modifiedAt")));
+
+        return scheduleRepository.getSchedulesByPage(pageable);
     }
 }

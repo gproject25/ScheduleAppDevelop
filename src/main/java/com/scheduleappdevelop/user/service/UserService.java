@@ -58,7 +58,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<GetUsersResponse> getAll() {
-        //soft Delete 안되어 있는 유저들 전체 조회
+        //soft Delete 안된 유저들 전체 조회
         List<User> users = userRepository.findAllByDeletedFalse();
 
         return users.stream().map(user -> new GetUsersResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt())).toList();
@@ -103,17 +103,20 @@ public class UserService {
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new EntityNotFoundException("유저가 없습니다"));
 
-        //dirty check방식으로 soft delete
-
-        //관련된 일정 + 댓글 soft delete
+        //관련된 일정과 댓글 soft delete
         List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
         for (Schedule schedule : schedules) {
-
             List<Comment> comments = commentRepository.findAllByScheduleId(schedule.getId());
             for (Comment comment : comments) {
                 comment.softDelete();
             }
             schedule.softDelete();
+        }
+
+        //유저가 작성한 댓글도 soft delete
+        List<Comment> comments = commentRepository.findAllByUserId(userId);
+        for (Comment comment : comments) {
+            comment.softDelete();
         }
 
         user.softDelete();

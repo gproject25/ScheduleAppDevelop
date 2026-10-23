@@ -14,6 +14,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("SELECT c FROM Comment c JOIN c.user u WHERE c.deleted = false AND (:userId IS NULL OR u.id = :userId)")
     List<Comment> findAllByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT c FROM Comment c JOIN c.schedule s WHERE s.deleted = false AND s.id = :scheduleId")
+    @Query("SELECT c FROM Comment c JOIN c.schedule s WHERE c.deleted = false AND s.id = :scheduleId")
     List<Comment> findAllByScheduleId(@Param("scheduleId")Long scheduleId);
 }

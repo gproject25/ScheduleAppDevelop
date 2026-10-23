@@ -15,4 +15,5 @@ public class SchedulePageResponse {
     private final Long commentCount;
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
+    //private final boolean deleted;  delete 필드 대신 아예 포함 X
 }
