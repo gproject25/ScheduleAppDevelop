@@ -18,26 +18,24 @@ Spring Boot와 Spring Data JPA를 활용한 일정 및 사용자 관리 Part 2 �
 
 #### 📚 프로젝트 기록: [Velog - 프로젝트 개발 기록 및 학습 내용](https://velog.io/@juhan913/posts)
 
----------------
-
-## 📌 목차
-
-- [API 명세서](#-api-명세서)
-- [Diagram + ERD](#%EF%B8%8F-diagram--erd)
-
-
--------
 
 ---------------
+<br>
+
+---
+
 ## 📑 API 명세서
 
 ---
 
+![img_1.png](Images/img_1.png)
+
 #### Documentation: [Notion - 일정 관리 Develop API 명세서 ](https://bolder-shrimp-6f4.notion.site/Develop-API-402df7a8441c80ff9729d4e83ea973f1)
+
 
 -----------
 
-## 🗺️ Diagram + ERD
+## 🗺️ ERD
 
-
+![img.png](Images/img.png)
 
