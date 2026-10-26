@@ -58,7 +58,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public List<GetUsersResponse> getAll() {
-        //soft Delete 안된 유저들 전체 조회
+        //soft Delete 여뷰 확인
         List<User> users = userRepository.findAllByDeletedFalse();
 
         return users.stream().map(user -> new GetUsersResponse(user.getId(),user.getName(), user.getEmail(),user.getCreatedAt(),user.getModifiedAt())).toList();
@@ -66,7 +66,7 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public GetUserResponse getOne(Long userId) {
-        //soft Delete 안되어있는 유저 조회
+        //soft Delete 여부 확인
         User user = userRepository.findByIdAndDeletedFalse(userId).orElseThrow(
                 () -> new EntityNotFoundException("유저가 없습니다"));
 

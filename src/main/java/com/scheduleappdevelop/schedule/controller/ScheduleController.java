@@ -39,10 +39,10 @@ public class ScheduleController {
         return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getOne(scheduleId));
     }
 
-    //전체 일정 조회 -> 로그인 필요 없음
+    //전체 일정 조회 (작성자 포함 가능) -> 로그인 필요 없음
     @GetMapping("/schedules")
-    public ResponseEntity<List<GetSchedulesResponse>> getSchedules(){
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(null));
+    public ResponseEntity<List<GetSchedulesResponse>> getSchedules(@RequestParam(required = false) String author){
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(author));
     }
 
     //유저 일정 전체 조회 (login 상태)
@@ -51,7 +51,7 @@ public class ScheduleController {
         if(sessionUser == null){
             throw new UnauthorizedException("로그인이 필요합니다");
         }
-        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getAll(sessionUser.getId()));
+        return ResponseEntity.status(HttpStatus.OK).body(scheduleService.getCurrentAll(sessionUser.getId()));
     }
 
     //일정 수정

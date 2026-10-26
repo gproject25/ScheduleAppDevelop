@@ -56,9 +56,18 @@ public class ScheduleService {
     }
 
     @Transactional(readOnly = true)
-    public List<GetSchedulesResponse> getAll(Long userId) {
-        //userId가 null이면 전체 조회,  null이 아니면 userId에 해당하는 일정만 조회
+    public List<GetSchedulesResponse> getCurrentAll(Long userId) {
+        //userId에 해당하는 일정만 조회
         List<Schedule> schedules = scheduleRepository.findAllByActiveSchedule(userId);
+
+        return schedules.stream().map( schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
+    }
+
+
+    @Transactional(readOnly = true)
+    public List<GetSchedulesResponse> getAll(String author) {
+        //author이 포함되어 있으면 author 기준으로 전체 조회 (수정일 기준 정렬)
+        List<Schedule> schedules = scheduleRepository.findAllByAuthor(author);
 
         return schedules.stream().map( schedule -> new GetSchedulesResponse(schedule.getId(), schedule.getTitle(), schedule.getContent(), schedule.getUser().getName(), schedule.getCreatedAt(), schedule.getModifiedAt())).toList();
     }
