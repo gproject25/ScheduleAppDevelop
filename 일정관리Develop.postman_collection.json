@@ -237,6 +237,13 @@
               ],
               "path": [
                 "schedules"
+              ],
+              "query": [
+                {
+                  "key": "author",
+                  "value": "juhan",
+                  "disabled": true
+                }
               ]
             }
           },
