@@ -16,7 +16,7 @@ Spring Boot와 Spring Data JPA를 활용한 일정 및 사용자 관리 Part 2 �
 
 <br>
 
-#### 📚 프로젝트 기록: [Velog - 프로젝트 개발 기록 및 학습 내용]([https://velog.io/@juhan913/posts](https://velog.io/@juhan913/%EC%8B%A4%EC%8A%B5-%EC%9D%BC%EC%A0%95-%EA%B4%80%EB%A6%AC-%EC%95%B1-Develop-%EA%B5%AC%ED%98%84))
+#### 📚 프로젝트 기록: [Velog - 프로젝트 개발 기록 및 학습 내용]([https://velog.io/@juhan913/posts](https://velog.io/@juhan913/%EC%8B%A4%EC%8A%B5-%EC%9D%BC%EC%A0%95-%EA%B4%80%EB%A6%AC-%EC%95%B1-Develop-%EA%B5%AC%ED%98%84)
 
 
 ---------------
